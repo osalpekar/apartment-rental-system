@@ -1,4 +1,7 @@
 # OS Files
 .DS_Store
 
+#swap files
+*.swp
+
 node_modules/

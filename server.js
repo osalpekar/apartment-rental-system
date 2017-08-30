@@ -13,5 +13,7 @@ app.get('/app/users', function(req, res) {
     res.send('hip');
 });
 
+// MORE ROUTES FOR ELASTICSEARCH-RELATED FUNCTIONS
+// NEED A CATCHALL
 app.listen(PORT_NUMBER);
 console.log('Navigate to http://localhost:3000/app/users');

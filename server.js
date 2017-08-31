@@ -1,6 +1,8 @@
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
+var mysql = require('./mysql/mySqlFunctions.js');
+var elasticsearch = require('./elasticsearch/esFunctions.js');
 
 const PORT_NUMBER = 3000;
 

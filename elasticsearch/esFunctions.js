@@ -59,4 +59,12 @@ var search = function (indexName, matchObject) {
     });
 }
 
+module.exports = {
+    createIndex: createIndex,
+    deleteIndex: deleteIndex,
+    insertTenant: insertTenant,
+    countTenants: countTenants,
+    search: search
+};
+
 // createIndex('hello');

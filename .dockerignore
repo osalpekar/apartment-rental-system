@@ -1,0 +1,10 @@
+.dockerignore
+.git
+.gitignore
+.DS_Store
+*.swp
+*.pyc
+tags
+node_modules/
+bower_components/
+sparkVideoProcessor/test/

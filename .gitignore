@@ -10,6 +10,6 @@
 #dev
 tags
 
-sparkVideoProcessor/test/
+./sparkVideoProcessor/test/*
 node_modules/
 bower_components/

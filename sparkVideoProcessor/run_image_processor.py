@@ -26,6 +26,7 @@ if args.test:
     with open("test/test_output.txt", 'w') as f:
         f.writelines(rdd)
 else:
+    # this is the line that gets the images
     image = cv2.imread(args.input, cv2.IMREAD_UNCHANGED)
     image_collection = [(x, image) for x in range(10)]
     rdd = run(image_collection).collect()

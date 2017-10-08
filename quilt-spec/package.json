@@ -1,0 +1,7 @@
+{
+    "name": "apartment-spec",
+    "dependencies": {
+        "@quilt/quilt": "quilt/quilt",
+        "@quilt/elasticsearch": "quilt/elasticsearch"
+    }
+}

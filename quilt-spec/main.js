@@ -14,12 +14,12 @@ var baseMachine = new quilt.Machine({
 var numElasticServers = 1;
 const pw = 'runner';
 
-const elastic = new Elasticsearch(numElasticServers);
+const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
 const nodeServer = new quilt.Container('nodeServer', 'osalpekar/node-apartment-app', {
     env: {
         'password': pw,
-        'port': 3000
+        'port': '3000'
     }
 });
 
@@ -40,28 +40,28 @@ const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-outpu
 const postgres = new quilt.Container('postgres', 'library/postgres', {
     env: {
         'password': pw,
-        'port': 5432
+        'port': '5432'
     }
 });
 
 const mysql = new quilt.Container('mysql', 'library/mysql', {
     env: {
         'password': pw,
-        'port': 3306
+        'port': '3306'
     }
 });
 
 nodeServer.allowFrom(elastic, 9200);
-elastic.allowFrom(nodeServer, 9200);
+// elastic.allowFrom(nodeServer, 9200);
 nodeServer.allowFrom(postgres, 5432);
 postgres.allowFrom(nodeServer, 5432);
 nodeServer.allowFrom(mysql, 3306);
 mysql.allowFrom(nodeServer, 3306);
-logstash.allowFrom(elastic, 12346);
-elastic.allowFrom(logstash, 12346);
-logstash.allowFrom(postgres, 5432);
-postgres.allowFrom(logstash, 5432);
-nodeServer.allowFrom(publicInternet, 3000);
+// logstash.allowFrom(elastic, 12346);
+// elastic.allowFrom(logstash, 12346);
+// logstash.allowFrom(postgres, 5432);
+// postgres.allowFrom(logstash, 5432);
+nodeServer.allowFrom(quilt.publicInternet, 3000);
 
 
 deployment.deploy(baseMachine.asMaster());

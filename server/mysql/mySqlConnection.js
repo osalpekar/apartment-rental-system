@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-  host: 'mysql.q',
+  host: 'mysql',
   // user: 'user',
   password: 'password',
   database: 'database name'

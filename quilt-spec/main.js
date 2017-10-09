@@ -47,26 +47,22 @@ const postgres = new quilt.Container('postgres', 'library/postgres', {
     }
 });
 
-const mysql = new quilt.Container('mysql', 'library/mysql', {
-    env: {
-        'password': pw,
-        'port': '3306'
-    }
-});
+const mysql = new quilt.Container('mysql', 'mysql:5.6.32');
+mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 
-const mongo = new quilt.Container('mongo', 'library/mongo', {
-    env: {
-        'password': pw,
-        'port': '27107'
-    }
-});
+// const mongo = new quilt.Container('mongo', 'library/mongo', {
+//     env: {
+//         'password': pw,
+//         'port': '27107'
+//     }
+// });
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);
 node.container.allowFrom(mysql, 3306);
 mysql.allowFrom(node.container, 3306);
 // node.container.allowFrom(mongo, 27017);
-mongo.allowFrom(node.container, 27017);
+// mongo.allowFrom(node.container, 27017);
 
 elastic.addClient(logstash);
 logstash.placeOn({size: "m4.large"});

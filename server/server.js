@@ -7,7 +7,7 @@ var postgres = require('./postgres/postgresConnection.js');
 
 const PORT_NUMBER = 3000;
 
-mongoose.connect('mongodb://mongo.q/tenantData');
+// mongoose.connect('mongodb://mongo.q/tenantData');
 
 app.use(express.static(__dirname + 'client/'));
 app.use('/scripts', express.static(__dirname + 'node_modules/'));

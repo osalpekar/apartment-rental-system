@@ -24,7 +24,6 @@ const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 //     }
 // });
 
-const node = new nodeServer(elastic);
 
 const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output'); //, {
     // env: {
@@ -56,6 +55,11 @@ mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 //         'port': '27107'
 //     }
 // });
+
+const mysqlHost = mysql.hostname();
+const elasticURL = 'http://' + elastic.hostname() + ':9200/'; 
+const postgresURL = 'postgresql://' + postgres.hostname() + ':5432/mydb'
+const node = new nodeServer(elastic, mysqlHost, elasticURL, postgresURL);
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);

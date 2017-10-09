@@ -54,12 +54,19 @@ const mysql = new quilt.Container('mysql', 'library/mysql', {
     }
 });
 
-// node.allowFrom(elastic, 9200);
-// elastic.allowFrom(nodeServer, 9200);
+const mongo = new quilt.Container('mongo', 'library/mongo', {
+    env: {
+        'password': pw,
+        'port': '27107'
+    }
+});
+
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);
 node.container.allowFrom(mysql, 3306);
 mysql.allowFrom(node.container, 3306);
+// node.container.allowFrom(mongo, 27017);
+mongo.allowFrom(node.container, 27017);
 
 elastic.addClient(logstash);
 logstash.placeOn({size: "m4.large"});
@@ -71,12 +78,9 @@ quilt.allow(logstash, postgres, 5432);
 // postgres.allowFrom(logstash, 5432);
 
 
-// node.container.allowFrom(quilt.publicInternet, 3000);
-
 
 deployment.deploy(baseMachine.asMaster());
 deployment.deploy(baseMachine.asWorker().replicate(5));
-// deployment.deploy(nodeServer);
 node.deploy(deployment);
 deployment.deploy(elastic);
 deployment.deploy(logstash);

@@ -1,5 +1,6 @@
 const quilt = require('@quilt/quilt');
 const elasticsearch = require('@quilt/elasticsearch');
+const nodeServer = require('./nodeServer.js').nodeServer;
 
 const deployment = quilt.createDeployment({namespace: "omkar"});
 
@@ -16,12 +17,14 @@ const pw = 'runner';
 
 const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
-const nodeServer = new quilt.Container('nodeServer', 'osalpekar/node-apartment-app', {
-    env: {
-        'password': pw,
-        'port': '3000'
-    }
-});
+// const nodeServer = new quilt.Container('nodeServer', 'osalpekar/node-apartment-app', {
+//     env: {
+//         'password': pw,
+//         'port': '3000'
+//     }
+// });
+
+const node = new nodeServer(elastic);
 
 const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output'); //, {
     // env: {
@@ -51,22 +54,30 @@ const mysql = new quilt.Container('mysql', 'library/mysql', {
     }
 });
 
-nodeServer.allowFrom(elastic, 9200);
+// node.allowFrom(elastic, 9200);
 // elastic.allowFrom(nodeServer, 9200);
-nodeServer.allowFrom(postgres, 5432);
-postgres.allowFrom(nodeServer, 5432);
-nodeServer.allowFrom(mysql, 3306);
-mysql.allowFrom(nodeServer, 3306);
+node.container.allowFrom(postgres, 5432);
+postgres.allowFrom(node.container, 5432);
+node.container.allowFrom(mysql, 3306);
+mysql.allowFrom(node.container, 3306);
+
+elastic.addClient(logstash);
+logstash.placeOn({size: "m4.large"});
+quilt.allow(logstash, postgres, 5432);
+
 // logstash.allowFrom(elastic, 12346);
 // elastic.allowFrom(logstash, 12346);
 // logstash.allowFrom(postgres, 5432);
 // postgres.allowFrom(logstash, 5432);
-nodeServer.allowFrom(quilt.publicInternet, 3000);
+
+
+// node.container.allowFrom(quilt.publicInternet, 3000);
 
 
 deployment.deploy(baseMachine.asMaster());
 deployment.deploy(baseMachine.asWorker().replicate(5));
-deployment.deploy(nodeServer);
+// deployment.deploy(nodeServer);
+node.deploy(deployment);
 deployment.deploy(elastic);
 deployment.deploy(logstash);
 deployment.deploy(postgres);

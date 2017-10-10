@@ -4,15 +4,7 @@ function nodeServer(es, mysqlHost, elasticURL, postgresURL) {
     this.container = new Container('nodeServer', 'osalpekar/node-apartment-app', {
         command: [
             'node', 'server.js', '--port', this.port.toString()
-            // '--elasticsearch', es.uri(),
         ]
-        // env: {
-            // 'password': pw,
-            // 'port': '3000'
-            // mySQLHost: mysqlHost,
-            // elasticURL: elasticURL,
-            // postgresURL: postgresURL
-        // }
     });
     es.addClient(this.container);
     this.container.setEnv('mySQLHost', mysqlHost);

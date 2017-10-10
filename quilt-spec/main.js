@@ -17,20 +17,7 @@ const pw = 'runner';
 
 const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
-// const nodeServer = new quilt.Container('nodeServer', 'osalpekar/node-apartment-app', {
-//     env: {
-//         'password': pw,
-//         'port': '3000'
-//     }
-// });
-
-
-const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output'); //, {
-    // env: {
-        // 'password': pw,
-        // 'port': 12346
-    // }
-// });
+const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output');
 
 // const spark = new quilt.Container('spark', 'osalpekar/spark-service', {
 //     env: {
@@ -50,10 +37,10 @@ const mysql = new quilt.Container('mysql', 'mysql:5.6.32', {
     env: {
         MYSQL_USER: 'user',
         MYSQL_PASSWORD: pw,
-        MYSQL_DATABASE: 'my_db'
+        MYSQL_DATABASE: 'my_db',
+        MYSQL_ROOT_PASSWORD: pw
     }
 });
-mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 
 // const mongo = new quilt.Container('mongo', 'library/mongo', {
 //     env: {
@@ -63,13 +50,10 @@ mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 // });
 
 const mysqlHost = mysql.getHostname();
-// const elasticURL = 'http://' + elastic.containers[0].getHostname() + ':9200/'; 
-// console.log(elasticURL);
 const postgresURL = 'postgresql://postgres:runner@' + postgres.getHostname() + ':5432/postgres'
+
 const node = new nodeServer(elastic, mysqlHost, elastic.uri(), postgresURL);
-console.log(elastic.uri());
-console.log(mysqlHost);
-console.log(postgresURL);
+
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);
@@ -81,12 +65,6 @@ mysql.allowFrom(node.container, 3306);
 elastic.addClient(logstash);
 logstash.placeOn({size: "m4.large"});
 quilt.allow(logstash, postgres, 5432);
-
-// logstash.allowFrom(elastic, 12346);
-// elastic.allowFrom(logstash, 12346);
-// logstash.allowFrom(postgres, 5432);
-// postgres.allowFrom(logstash, 5432);
-
 
 
 deployment.deploy(baseMachine.asMaster());

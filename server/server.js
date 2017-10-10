@@ -5,6 +5,7 @@ var mysql = require('./mysql/mySqlFunctions.js');
 var elasticsearch = require('./elasticsearch/esFunctions.js');
 var postgres = require('./postgres/postgresConnection.js');
 
+console.log(process.env.mySQLHost);
 const PORT_NUMBER = 3000;
 
 // mongoose.connect('mongodb://mongo.q/tenantData');

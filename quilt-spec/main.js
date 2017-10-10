@@ -46,7 +46,13 @@ const postgres = new quilt.Container('postgres', 'library/postgres', {
     }
 });
 
-const mysql = new quilt.Container('mysql', 'mysql:5.6.32');
+const mysql = new quilt.Container('mysql', 'mysql:5.6.32', {
+    env: {
+        MYSQL_USER: 'user',
+        MYSQL_PASSWORD: pw,
+        MYSQL_DATABASE: 'my_db'
+    }
+});
 mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 
 // const mongo = new quilt.Container('mongo', 'library/mongo', {
@@ -56,10 +62,14 @@ mysql.setEnv('MYSQL_ROOT_PASSWORD', pw);
 //     }
 // });
 
-const mysqlHost = mysql.hostname();
-const elasticURL = 'http://' + elastic.hostname() + ':9200/'; 
-const postgresURL = 'postgresql://' + postgres.hostname() + ':5432/mydb'
-const node = new nodeServer(elastic, mysqlHost, elasticURL, postgresURL);
+const mysqlHost = mysql.getHostname();
+// const elasticURL = 'http://' + elastic.containers[0].getHostname() + ':9200/'; 
+// console.log(elasticURL);
+const postgresURL = 'postgresql://postgres:runner@' + postgres.getHostname() + ':5432/postgres'
+const node = new nodeServer(elastic, mysqlHost, elastic.uri(), postgresURL);
+console.log(elastic.uri());
+console.log(mysqlHost);
+console.log(postgresURL);
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);

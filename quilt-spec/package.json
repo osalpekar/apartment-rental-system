@@ -1,5 +1,9 @@
 {
     "name": "apartment-spec",
+    "version": "1.0.0",
+    "main": "./main.js",
+    "author": "Omkar Salpekar",
+    "license": "MIT",
     "dependencies": {
         "@quilt/quilt": "quilt/quilt",
         "@quilt/elasticsearch": "quilt/elasticsearch"

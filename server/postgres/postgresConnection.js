@@ -5,8 +5,7 @@ var client = new pg.Client(conString);
 client.connect();
 
 const query = client.query(
-  'CREATE TABLE items(id SERIAL PRIMARY KEY, text VARCHAR(40) not null, complete BOOLEAN)');
+  'CREATE TABLE items(id SERIAL PRIMARY KEY, text VARCHAR(40) not null)');
 query.on('end', () => { client.end(); });
 
 module.exports = client;
-

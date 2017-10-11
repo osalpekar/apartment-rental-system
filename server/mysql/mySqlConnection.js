@@ -12,6 +12,12 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   console.log('Connected!');
+  var sql = "CREATE TABLE people (id primary key auto_increment, text VARCHAR(255))";
+
+  connection.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("Table created");
+  });
 });
 
 module.exports = connection;

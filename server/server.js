@@ -15,6 +15,8 @@ const PORT_NUMBER = 3000;
 app.use(express.static(__dirname + 'client/'));
 app.use('/scripts', express.static(__dirname + 'node_modules/'));
 
+// The 5 endpoints are defined below 
+
 app.get('/app/users', function(req, res) {
     res.send('Welcome to the nultiservice application!');
 });

@@ -14,6 +14,6 @@ is running on. \\
 # Routes
 
 The following routes are defined in the server:
-1. <ip>:3000/app/psql/users - read/write to postgres database instance
-1. <ip>:3000/app/mysql/users - read/write to mySQL database instance
+1. ip_address:3000/app/psql/users - read/write to postgres database instance
+1. ip_address:3000/app/mysql/users - read/write to mySQL database instance
 

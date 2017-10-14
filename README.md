@@ -17,8 +17,9 @@ The following routes are defined in the server:
 1. ip_address:3000/app/psql/users - read/write to postgres database instance
 1. ip_address:3000/app/mysql/users - read/write to mySQL database instance
 1. ip_address:3000/app/users - welcome message for the app 
+1. ip_address:3000/app/elastic/count - count of items in elastic index
 
 
 Use Apache JMeter for load testing using the endpoints defined above. The first
-2 endpoints have GET and POST requests defined whereas the last one only has a
+2 endpoints have GET and POST requests defined whereas the last two only have a
 GET request.

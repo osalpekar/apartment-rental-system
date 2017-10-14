@@ -33,6 +33,7 @@ var insertTenant = function (indexName, tenantObject) {
 var countTenants = function(indexName) {
     client.count({index: indexName ,type: 'tenant'},function(err,resp,status) {
       console.log("constituencies",resp);
+        return(resp);
     });
 }
 

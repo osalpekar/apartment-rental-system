@@ -14,6 +14,7 @@ const PORT_NUMBER = 3000;
 
 app.use(express.static(__dirname + 'client/'));
 app.use('/scripts', express.static(__dirname + 'node_modules/'));
+elasticsearch.createIndex('items');
 
 // The 5 endpoints are defined below 
 
@@ -70,5 +71,9 @@ app.post('/app/mysql/users', function(req, res, next) {
     });
 });
 
+app.get('/app/elastic/count', function(req, res, next) {
+    return res.json(elasticsearch.countTenants('items'));
+});
+
 app.listen(PORT_NUMBER);
-console.log('Navigate to http://localhost:3000/app/users');
+// console.log('Navigate to http://localhost:3000/app/users');

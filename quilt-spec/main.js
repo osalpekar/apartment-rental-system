@@ -68,7 +68,7 @@ quilt.allow(logstash, postgres, 5432);
 
 
 deployment.deploy(baseMachine.asMaster());
-deployment.deploy(baseMachine.asWorker().replicate(5));
+deployment.deploy(baseMachine.asWorker().replicate(11));
 node.deploy(deployment);
 deployment.deploy(elastic);
 deployment.deploy(logstash);

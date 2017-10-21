@@ -79,7 +79,8 @@ app.get('/app/mysql/users', function(req, res, next) {
 
 app.post('/app/mysql/users', function(req, res, next) {
     const data = {text: req.body.text};
-    const query = "INSERT INTO people (text) VALUES ('$1')", [data.text];
+    // const query = "INSERT INTO people (text) VALUES ('$1')", [data.text];
+    const query = "INSERT INTO people (text) VALUES ('aaa')";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;

@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
-var mysql = require('./mysql/mySqlFunctions.js');
+var mysql = require('./mysql/mySqlConnection.js');
 var elasticsearch = require('./elasticsearch/esFunctions.js');
 var postgres = require('./postgres/postgresConnection.js');
 // const router = express.Router();
@@ -19,7 +19,7 @@ elasticsearch.createIndex('items');
 // The 5 endpoints are defined below 
 
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the nultiservice application!');
+    res.send('Welcome to the multiservice application!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {

@@ -13,7 +13,7 @@ connection.connect(function(err) {
     if (err) throw err;
     console.log('Connected!');
 
-    var sql = "CREATE TABLE people (id primary key auto_increment, text VARCHAR(255))";
+    var sql = "CREATE TABLE people (ID int NOT NULL AUTO_INCREMENT, text VARCHAR(255), PRIMARY KEY (ID))";
 
     connection.query(sql, function (err, result) {
         if (err) throw err;

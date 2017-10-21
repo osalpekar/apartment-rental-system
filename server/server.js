@@ -52,6 +52,22 @@ app.post('/app/psql/users', function(req, res, next) {
     });
 });
 
+app.delete('/app/psql/users', function(req, res, next) {
+    const results = [];
+    // const data = {text: req.body.text};
+    postgres.query('DELETE FROM items LIMIT 1');
+    const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
+
+    query.on('row', function(row) {
+        results.push(row);
+    });
+
+    query.on('end', function() {
+        done();
+        return res.json(results);
+    });
+});
+
 app.get('/app/mysql/users', function(req, res, next) {
     const query = 'SELECT * FROM people';
 
@@ -64,6 +80,16 @@ app.get('/app/mysql/users', function(req, res, next) {
 app.post('/app/mysql/users', function(req, res, next) {
     const data = {text: req.body.text};
     const query = "INSERT INTO people (text) VALUES ('$1')", [data.text];
+
+    mysql.query(query, function(err, result, fields) {
+        if (err) throw err;
+        return res.json(result);
+    });
+});
+
+app.delete('/app/mysql/users', function(req, res, next) {
+    // const data = {text: req.body.text};
+    const query = "DELETE FROM people LIMIT 1";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;

@@ -1,1 +1,8 @@
 opencv-python
+py4j
+pyspark
+numpy
+scipy
+mysql-connector
+
+

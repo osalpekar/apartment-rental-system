@@ -1,13 +1,14 @@
 import pyspark
 from pyspark import SparkContext
 import cv2
+import os
 import numpy as np 
 import scipy as sp
 import struct
 import argparse
 import mysql.connector
 import cStringIO
-from PIL import Image
+# from PIL import Image
 from helper_functions import *
 from constants import *
 from spark_image_compressor import run
@@ -30,18 +31,19 @@ if args.test:
         f.writelines(rdd)
 else:
     #connecting mysql
-    db = mysql.connector.connect(user='root', password='pwd',
-                              host='localhost',
-                              database='cbir')
-    sql1='select * from img'
-    cursor=db.cursor()
-    db.commit()
-    cursor.execute(sql1)
-    data=cursor.fetchall()
-    file_like=cStringIO.StringIO(data[0][0])
-    img=PIL.Image.open(file_like)
+    # db = mysql.connector.connect(user='user', password='runner',
+    #                           host=os.environ['mySQLHost'],
+    #                           database='my_db')
+    # sql1='select * from people'
+    # cursor=db.cursor()
+    # db.commit()
+    # cursor.execute(sql1)
+    # data=cursor.fetchall()
+
+    # file_like=cStringIO.StringIO(data[0][0])
+    # img=PIL.Image.open(file_like)
     # this is the line that gets the images
-    image = cv2.imread(img, cv2.IMREAD_UNCHANGED)
+    image = cv2.imread(args.input, cv2.IMREAD_UNCHANGED)
     image_collection = [(x, image) for x in range(10)]
     rdd = run(image_collection).collect()
     cv2.imwrite(args.output, rdd[0][1])

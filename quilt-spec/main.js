@@ -19,12 +19,6 @@ const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
 const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output');
 
-// const spark = new quilt.Container('spark', 'osalpekar/spark-service', {
-//     env: {
-//         'password': pw,
-//         'port': 12347
-//     }
-// });
 
 const postgres = new quilt.Container('postgres', 'library/postgres', {
     env: {
@@ -54,11 +48,19 @@ const postgresURL = 'postgresql://postgres:runner@' + postgres.getHostname() + '
 
 const node = new nodeServer(elastic, mysqlHost, elastic.uri(), postgresURL);
 
+const spark = new quilt.Container('spark', 'osalpekar/spark-service', {
+    env: {
+        'password': pw,
+        'port': 12347,
+        'mySQLHost': mysqlHost
+    }
+});
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);
 node.container.allowFrom(mysql, 3306);
 mysql.allowFrom(node.container, 3306);
+spark.allowFrom(mysql, 3306);
 // node.container.allowFrom(mongo, 27017);
 // mongo.allowFrom(node.container, 27017);
 

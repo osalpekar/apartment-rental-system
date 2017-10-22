@@ -1,7 +1,7 @@
 const { Container, publicInternet } = require('@quilt/quilt');
 
 function nodeServer(es, mysqlHost, elasticURL, postgresURL) {
-    this.container = new Container('nodeServer', 'osalpekar/node-apartment-app', {
+    this.container = new Container('nodeServer', 'tsaianson/node-apt-app', {
         command: [
             'node', 'server.js', '--port', this.port.toString()
         ]

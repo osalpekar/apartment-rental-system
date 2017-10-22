@@ -24,22 +24,25 @@ app.get('/app/users', function(req, res) {
 
 app.get('/app/psql/users', function(req, res, next) {
     const results = [];
-    const query = postgres.query('SELECT * FROM items ORDER BY id ASC;');
+    const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
     
     query.on('row', function(row) {
         results.push(row);
     });
     
     query.on('end', function() {
-        done();
         return res.json(results);
     });
+
+    query.on('error', (err) => {
+        console.error(err.stack)
+    })
 });
 
 app.post('/app/psql/users', function(req, res, next) {
     const results = [];
-    const data = {text: req.body.text};
-    postgres.query('INSERT INTO items(text) values($1)', [data.text]);
+    // const data = {text: req.body.text};
+    postgres.query("INSERT INTO items (text) values('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')");
     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
 
     query.on('row', function(row) {
@@ -47,15 +50,18 @@ app.post('/app/psql/users', function(req, res, next) {
     });
 
     query.on('end', function() {
-        done();
         return res.json(results);
     });
+
+    query.on('error', (err) => {
+        console.error(err.stack)
+    })
 });
 
 app.delete('/app/psql/users', function(req, res, next) {
     const results = [];
     // const data = {text: req.body.text};
-    postgres.query('DELETE FROM items LIMIT 1');
+    postgres.query('DELETE FROM items WHERE id=(SELECT MAX(id) from items)');
     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
 
     query.on('row', function(row) {
@@ -63,9 +69,12 @@ app.delete('/app/psql/users', function(req, res, next) {
     });
 
     query.on('end', function() {
-        done();
         return res.json(results);
     });
+
+    query.on('error', (err) => {
+        console.error(err.stack)
+    })
 });
 
 app.get('/app/mysql/users', function(req, res, next) {
@@ -78,9 +87,9 @@ app.get('/app/mysql/users', function(req, res, next) {
 });
 
 app.post('/app/mysql/users', function(req, res, next) {
-    const data = {text: req.body.text};
+    // const data = {text: req.body.text};
     // const query = "INSERT INTO people (text) VALUES ('$1')", [data.text];
-    const query = "INSERT INTO people (text) VALUES ('aaa')";
+    const query = "INSERT INTO people (text) VALUES ('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;
@@ -90,7 +99,7 @@ app.post('/app/mysql/users', function(req, res, next) {
 
 app.delete('/app/mysql/users', function(req, res, next) {
     // const data = {text: req.body.text};
-    const query = "DELETE FROM people ORDER BY ID LIMIT 1";
+    const query = "DELETE FROM people ORDER BY ID DESC LIMIT 1";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;

@@ -90,7 +90,7 @@ app.post('/app/mysql/users', function(req, res, next) {
 
 app.delete('/app/mysql/users', function(req, res, next) {
     // const data = {text: req.body.text};
-    const query = "DELETE FROM people LIMIT 1";
+    const query = "DELETE FROM people ORDER BY ID LIMIT 1";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;

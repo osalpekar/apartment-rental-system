@@ -107,10 +107,45 @@ app.delete('/app/mysql/users', function(req, res, next) {
     });
 });
 
+var contiuneElasticGet = function(req, res, name) {
+    elasticsearch.search('items', name).then(function(result) {
+        if (result.hits.total == 0) {
+            contiuneElasticGet(req, res, name);
+        } else {
+            res.json(result);
+        }
+    });
+}
+
+var responseHitsNone = function(req, res, name) {
+    console.log(name);
+    const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+    query.on('end', () => {
+    	contiuneElasticGet(req, res, name)
+    })
+    query.on('error', (err) => {
+    	console.error(err.stack)
+    })
+}
+
 app.get('/app/elastic/users', function(req, res, next) {
     name = Math.random().toString(36).substring(7);
-    return elasticsearch.search('items', name);
-    // elasticsearch.ping();
+    elasticsearch.search('items', name).then(function(result) {
+        console.log(result.hits.total);
+        if (result.hits.total == 0) {
+            responseHitsNone(req, res, name);
+        } else {
+            res.json(result);
+        }
+    });
+
+
+
+
+
+
+
+    //elasticsearch.ping();
     // esRes = JSON.parse(elasticsearch.search('items', name));
     // if (esRes is true) {
     //     return res.join(elasticsearch.search('items', name));

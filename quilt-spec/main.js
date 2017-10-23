@@ -1,6 +1,7 @@
 const quilt = require('@quilt/quilt');
 const elasticsearch = require('@quilt/elasticsearch');
 const nodeServer = require('./nodeServer.js').nodeServer;
+const Kibana = require('./kibana.js').Kibana;
 
 const deployment = quilt.createDeployment({namespace: "tsaianson-aptapp"});
 
@@ -18,6 +19,7 @@ const pw = 'runner';
 const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
 const logstash = new quilt.Container('logstash', 'hantaowang/logstash-postgres');
+const kib = new Kibana(elastic);
 
 // const spark = new quilt.Container('spark', 'osalpekar/spark-service', {
 //     env: {
@@ -69,9 +71,10 @@ quilt.allow(logstash, postgres, 5432);
 
 
 deployment.deploy(baseMachine.asMaster());
-deployment.deploy(baseMachine.asWorker().replicate(5));
+deployment.deploy(baseMachine.asWorker().replicate(6));
 node.deploy(deployment);
 deployment.deploy(elastic);
 deployment.deploy(logstash);
 deployment.deploy(postgres);
 deployment.deploy(mysql);
+deployment.deploy(kib);

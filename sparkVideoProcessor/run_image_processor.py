@@ -31,22 +31,24 @@ if args.test:
         f.writelines(rdd)
 else:
     #connecting mysql
+    # db = mysql.connector.connect(user='user', password='runner',
+    #                           host=os.environ['mySQLHost'],
+    #                           database='my_db')
+    # cursor=db.cursor()
+    # db.commit()
+    sc = SparkContext()
     while True:
-        db = mysql.connector.connect(user='user', password='runner',
-                                  host=os.environ['mySQLHost'],
-                                  database='my_db')
-        sql1='select * from people'
-        cursor=db.cursor()
-        db.commit()
-        cursor.execute(sql1)
-        data=cursor.fetchall()
+        # sql1='select * from people'
+        # cursor.execute(sql1)
+        # data=cursor.fetchall()
+        # if len(data) % 3 == 0:
 
-        # file_like=cStringIO.StringIO(data[0][0])
-        # img=PIL.Image.open(file_like)
-        # this is the line that gets the images
+            # file_like=cStringIO.StringIO(data[0][0])
+            # img=PIL.Image.open(file_like)
+            # this is the line that gets the images
         image = cv2.imread(args.input, cv2.IMREAD_UNCHANGED)
         image_collection = [(x, image) for x in range(10)]
-        rdd = run(image_collection).collect()
+        rdd = run(image_collection, sc).collect()
         cv2.imwrite(args.output, rdd[0][1])
 
 

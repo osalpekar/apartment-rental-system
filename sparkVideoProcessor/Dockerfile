@@ -35,8 +35,11 @@ RUN apt-get -yqq update && \
     sed -i -e s/WARN/ERROR/g spark/conf/log4j.properties && \
     sed -i -e s/INFO/ERROR/g spark/conf/log4j.properties
 
+RUN apt-get update
 RUN apt-get install -y python2.7
-RUN apt-get install -y python-pip
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+RUN python get-pip.py
+# RUN apt-get install -y python-pip
 
 RUN mkdir -p /usr/src/app
 
@@ -45,6 +48,8 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 RUN pip install -r requirements.txt
+# RUN pip install pyspark
+RUN pip install mysql-connector==2.1.4
 
 
 CMD ["spark-submit", "run_image_processor.py", "-i", "test/test1.jpg", "-o", "test/test_out.jpg"]

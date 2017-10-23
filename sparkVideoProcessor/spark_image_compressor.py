@@ -196,13 +196,13 @@ def combine_sub_blocks(rdd):
     rdd = rdd.map(stitcher_3d)
     return rdd
 
-def run(images):
+def run(images, sc):
     """
     Returns an RDD where all the images will be proccessed once the RDD is aggregated.
     The format returned in the RDD should be (image_id, image_matrix) where image_matrix 
     is an np array of size (height, width, 3).
     """
-    sc = SparkContext()
+    # sc = SparkContext()
     rdd = sc.parallelize(images, 16) \
         .map(truncate).repartition(16)
     rdd = generate_Y_cb_cr_matrices(rdd)

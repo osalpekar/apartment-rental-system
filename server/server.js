@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var mysql = require('./mysql/mySqlConnection.js');
 var elasticsearch = require('./elasticsearch/esF1.js');
 var postgres = require('./postgres/postgresConnection.js');
+var count1 = 0;
 // const router = express.Router();
 const path = require('path');
 
@@ -133,12 +134,14 @@ var continueElasticGet = function(req, res, name) {
     // Generating unused random name
     uname = Math.random().toString(36).substring(7);
     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+    count1 += 1;
     query.on('end', () => {
         elasticsearch.search('items', name).then(function(result) {
             console.log(result.hits.total);
             if (result.hits.total < parseInt(count)) {
                 continueElasticGet(req, res, name);
             } else {
+                console.log("END" + count1.toString());
                 res.json(result);
             }
         });
@@ -147,6 +150,7 @@ var continueElasticGet = function(req, res, name) {
 
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
+    count1 = 0;
     name = Math.random().toString(36).substring(7);
     console.log(name);
     elasticsearch.search('items', name).then(function(result) {
@@ -156,6 +160,14 @@ app.get('/app/elastic/users/:count', function(req, res, next) {
         } else {
             res.json(result);
         }
+    });
+});
+
+
+app.get('/app/elastic/count/:word', function(req, res, next) {
+    var name = req.params.word;
+    elasticsearch.search('items', name).then(function(result) {
+            res.json(result);
     });
     //elasticsearch.ping();
     // esRes = JSON.parse(elasticsearch.search('items', name));

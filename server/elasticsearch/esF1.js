@@ -1,4 +1,9 @@
-var client = require('./esConnection.js')
+var clientCreate = require('./esConnection.js');
+
+var client = clientCreate();
+while (!ping()) {
+    client = clientCreate();
+}
 
 var createIndex = function (indexName) {
     client.indices.create({
@@ -69,8 +74,10 @@ var ping = function () {
     }, function (error) {
         if (error) {
             console.trace('elasticsearch cluster is down!');
+            return false;
         } else {
             console.log('All is well');
+            return true;
         }
     });
 }

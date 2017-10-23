@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var mysql = require('./mysql/mySqlConnection.js');
-var elasticsearch = require('./elasticsearch/esFunctions.js');
+var elasticsearch = require('./elasticsearch/esF1.js');
 var postgres = require('./postgres/postgresConnection.js');
 // const router = express.Router();
 const path = require('path');
@@ -16,7 +16,7 @@ app.use(express.static(__dirname + 'client/'));
 app.use('/scripts', express.static(__dirname + 'node_modules/'));
 elasticsearch.createIndex('items');
 
-// The 5 endpoints are defined below 
+// The 5 endpoints are defined below
 
 app.get('/app/users', function(req, res) {
     res.send('Welcome to the multiservice application!');
@@ -25,11 +25,11 @@ app.get('/app/users', function(req, res) {
 app.get('/app/psql/users', function(req, res, next) {
     const results = [];
     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
-    
+
     query.on('row', function(row) {
         results.push(row);
     });
-    
+
     query.on('end', function() {
         return res.json(results);
     });
@@ -107,8 +107,18 @@ app.delete('/app/mysql/users', function(req, res, next) {
     });
 });
 
-app.get('/app/elastic/count', function(req, res, next) {
-    return res.json(elasticsearch.countTenants('items'));
+app.get('/app/elastic/users', function(req, res, next) {
+    // name = Math.random().toString(36).substring(7);
+    // return elasticsearch.search('items', name);
+    res.send('HIT');
+    // esRes = JSON.parse(elasticsearch.search('items', name));
+    // if (esRes is true) {
+    //     return res.join(elasticsearch.search('items', name));
+    // }
+    // postgres.query("INSERT INTO items (text) values($1)", [name]);
+    // while esRes is still false
+    //     esRes = JSON.parse(elasticsearch.search('items', name));
+    // return res.json(elasticsearch.search('items', name));
 });
 
 app.listen(PORT_NUMBER);

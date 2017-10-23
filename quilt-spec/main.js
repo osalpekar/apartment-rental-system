@@ -17,7 +17,7 @@ const pw = 'runner';
 
 const elastic = new elasticsearch.Elasticsearch(numElasticServers);
 
-// const logstash = new quilt.Container('logstash', 'lomo/logstash-postgresql-output');
+const logstash = new quilt.Container('logstash', 'hantaowang/logstash-postgres');
 
 // const spark = new quilt.Container('spark', 'osalpekar/spark-service', {
 //     env: {
@@ -63,15 +63,15 @@ mysql.allowFrom(node.container, 3306);
 // node.container.allowFrom(mongo, 27017);
 // mongo.allowFrom(node.container, 27017);
 
-// elastic.addClient(logstash);
-// logstash.placeOn({size: "m4.large"});
-// quilt.allow(logstash, postgres, 5432);
+elastic.addClient(logstash);
+logstash.placeOn({size: "m4.large"});
+quilt.allow(logstash, postgres, 5432);
 
 
 deployment.deploy(baseMachine.asMaster());
 deployment.deploy(baseMachine.asWorker().replicate(5));
 node.deploy(deployment);
 deployment.deploy(elastic);
-// deployment.deploy(logstash);
+deployment.deploy(logstash);
 deployment.deploy(postgres);
 deployment.deploy(mysql);

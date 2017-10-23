@@ -45,12 +45,26 @@ var search = function (indexName, matchObject) {
         if (error){
             console.log("search error: "+error)
         } else {
-            console.log("--- Response ---");
-            console.log(response);
-            console.log("--- Hits ---");
-            response.hits.hits.forEach(function(hit){
-                console.log(hit);
-            })
+            return response;
+            // console.log("--- Response ---");
+            // console.log(response);
+            // console.log("--- Hits ---");
+            // response.hits.hits.forEach(function(hit){
+            //     console.log(hit);
+            // })
+        }
+    });
+}
+
+var ping = function () {
+    client.ping({
+    // ping usually has a 3000ms timeout
+        requestTimeout: 1000
+    }, function (error) {
+        if (error) {
+            console.trace('elasticsearch cluster is down!');
+        } else {
+            console.log('All is well');
         }
     });
 }
@@ -59,5 +73,6 @@ module.exports = {
     createIndex: createIndex,
     deleteIndex: deleteIndex,
     insertItem: insertItem,
-    search: search
+    search: search,
+    ping: ping
 }

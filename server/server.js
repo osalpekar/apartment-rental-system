@@ -108,9 +108,9 @@ app.delete('/app/mysql/users', function(req, res, next) {
 });
 
 app.get('/app/elastic/users', function(req, res, next) {
-    // name = Math.random().toString(36).substring(7);
-    // return elasticsearch.search('items', name);
-    res.send('HIT');
+    name = Math.random().toString(36).substring(7);
+    return elasticsearch.search('items', name);
+    // elasticsearch.ping();
     // esRes = JSON.parse(elasticsearch.search('items', name));
     // if (esRes is true) {
     //     return res.join(elasticsearch.search('items', name));

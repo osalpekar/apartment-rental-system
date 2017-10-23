@@ -61,7 +61,7 @@ app.post('/app/psql/users', function(req, res, next) {
 app.delete('/app/psql/users', function(req, res, next) {
     const results = [];
     // const data = {text: req.body.text};
-    postgres.query('DELETE FROM items WHERE id=(SELECT MAX(id) from items)');
+    postgres.query('DELETE FROM items');
     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
 
     query.on('row', function(row) {
@@ -99,7 +99,7 @@ app.post('/app/mysql/users', function(req, res, next) {
 
 app.delete('/app/mysql/users', function(req, res, next) {
     // const data = {text: req.body.text};
-    const query = "DELETE FROM people ORDER BY ID DESC LIMIT 1";
+    const query = "DELETE FROM people";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;
@@ -107,44 +107,56 @@ app.delete('/app/mysql/users', function(req, res, next) {
     });
 });
 
-var contiuneElasticGet = function(req, res, name) {
-    elasticsearch.search('items', name).then(function(result) {
-        if (result.hits.total == 0) {
-            contiuneElasticGet(req, res, name);
-        } else {
-            res.json(result);
-        }
-    });
-}
+// var contiuneElasticGet = function(req, res, name) {
+//     elasticsearch.search('items', name).then(function(result) {
+//         if (result.hits.total == 0) {
+//             contiuneElasticGet(req, res, name);
+//         } else {
+//             res.json(result);
+//         }
+//     });
+// }
+//
+// var responseHitsNone = function(req, res, name) {
+//     console.log(name);
+//     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+//     query.on('end', () => {
+//     	contiuneElasticGet(req, res, name)
+//     })
+//     query.on('error', (err) => {
+//     	console.error(err.stack)
+//     })
+// }
 
-var responseHitsNone = function(req, res, name) {
-    console.log(name);
+var continueElasticGet = function(req, res, name) {
+    var count = req.params.count;
+    // Generating unused random name
+    uname = Math.random().toString(36).substring(7);
     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
     query.on('end', () => {
-    	contiuneElasticGet(req, res, name)
-    })
-    query.on('error', (err) => {
-    	console.error(err.stack)
-    })
+        elasticsearch.search('items', name).then(function(result) {
+            console.log(result.hits.total);
+            if (result.hits.total < parseInt(count)) {
+                continueElasticGet(req, res, name);
+            } else {
+                res.json(result);
+            }
+        });
+    });
 }
 
-app.get('/app/elastic/users', function(req, res, next) {
+app.get('/app/elastic/users/:count', function(req, res, next) {
+    var count = req.params.count;
     name = Math.random().toString(36).substring(7);
+    console.log(name);
     elasticsearch.search('items', name).then(function(result) {
         console.log(result.hits.total);
-        if (result.hits.total == 0) {
-            responseHitsNone(req, res, name);
+        if (result.hits.total < parseInt(count)) {
+            continueElasticGet(req, res, name);
         } else {
             res.json(result);
         }
     });
-
-
-
-
-
-
-
     //elasticsearch.ping();
     // esRes = JSON.parse(elasticsearch.search('items', name));
     // if (esRes is true) {

@@ -1,10 +1,5 @@
 var clientCreate = require('./esConnection.js');
 
-var client = clientCreate();
-while (!ping()) {
-    client = clientCreate();
-}
-
 var createIndex = function (indexName) {
     client.indices.create({
         index: indexName
@@ -81,6 +76,8 @@ var ping = function () {
         }
     });
 }
+
+var client = clientCreate();
 
 module.exports = {
     createIndex: createIndex,

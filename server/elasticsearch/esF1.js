@@ -1,4 +1,9 @@
-var client = require('./esConnection.js')
+var clientCreate = require('./esConnection.js');
+
+var client = clientCreate();
+while (!ping()) {
+    client = clientCreate();
+}
 
 var createIndex = function (indexName) {
     client.indices.create({
@@ -31,7 +36,7 @@ var insertItem = function (indexName, itemObject) {
 }
 
 var search = function (indexName, matchObject) {
-    client.search({
+    return client.search({
         index: indexName,
         type: 'items',
         body: {
@@ -41,19 +46,25 @@ var search = function (indexName, matchObject) {
                 }
             },
         }
-    }, function (error, response, status) {
-        if (error){
-            console.log("search error: "+error)
-        } else {
-            return response;
-            // console.log("--- Response ---");
-            // console.log(response);
-            // console.log("--- Hits ---");
-            // response.hits.hits.forEach(function(hit){
-            //     console.log(hit);
-            // })
-        }
-    });
+    })
+    // .then(function(result) {
+    //     res.json(result)
+    // });
+
+    // }, function (error, response, status) {
+    //     if (error){
+    //         console.log("search error: "+error)
+    //     } else {
+    //         console.log(response)
+    //         return response;
+    //         // console.log("--- Response ---");
+    //         // console.log(response);
+    //         // console.log("--- Hits ---");
+    //         // response.hits.hits.forEach(function(hit){
+    //         //     console.log(hit);
+    //         // })
+    //     }
+    // });
 }
 
 var ping = function () {
@@ -63,8 +74,10 @@ var ping = function () {
     }, function (error) {
         if (error) {
             console.trace('elasticsearch cluster is down!');
+            return false;
         } else {
             console.log('All is well');
+            return true;
         }
     });
 }

@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var mysql = require('./mysql/mySqlConnection.js');
 var elasticsearch = require('./elasticsearch/esF1.js');
 var postgres = require('./postgres/postgresConnection.js');
+var count1 = 0;
 // const router = express.Router();
 const path = require('path');
 
@@ -61,7 +62,7 @@ app.post('/app/psql/users', function(req, res, next) {
 app.delete('/app/psql/users', function(req, res, next) {
     const results = [];
     // const data = {text: req.body.text};
-    postgres.query('DELETE FROM items WHERE id=(SELECT MAX(id) from items)');
+    postgres.query('DELETE FROM items');
     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
 
     query.on('row', function(row) {
@@ -99,7 +100,7 @@ app.post('/app/mysql/users', function(req, res, next) {
 
 app.delete('/app/mysql/users', function(req, res, next) {
     // const data = {text: req.body.text};
-    const query = "DELETE FROM people ORDER BY ID DESC LIMIT 1";
+    const query = "DELETE FROM people";
 
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;
@@ -107,10 +108,68 @@ app.delete('/app/mysql/users', function(req, res, next) {
     });
 });
 
-app.get('/app/elastic/users', function(req, res, next) {
+// var contiuneElasticGet = function(req, res, name) {
+//     elasticsearch.search('items', name).then(function(result) {
+//         if (result.hits.total == 0) {
+//             contiuneElasticGet(req, res, name);
+//         } else {
+//             res.json(result);
+//         }
+//     });
+// }
+//
+// var responseHitsNone = function(req, res, name) {
+//     console.log(name);
+//     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+//     query.on('end', () => {
+//     	contiuneElasticGet(req, res, name)
+//     })
+//     query.on('error', (err) => {
+//     	console.error(err.stack)
+//     })
+// }
+
+var continueElasticGet = function(req, res, name) {
+    var count = req.params.count;
+    // Generating unused random name
+    uname = Math.random().toString(36).substring(7);
+    const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+    count1 += 1;
+    query.on('end', () => {
+        elasticsearch.search('items', name).then(function(result) {
+            console.log(result.hits.total);
+            if (result.hits.total < parseInt(count)) {
+                continueElasticGet(req, res, name);
+            } else {
+                console.log("END" + count1.toString());
+                res.json(result);
+            }
+        });
+    });
+}
+
+app.get('/app/elastic/users/:count', function(req, res, next) {
+    var count = req.params.count;
+    count1 = 0;
     name = Math.random().toString(36).substring(7);
-    return elasticsearch.search('items', name);
-    // elasticsearch.ping();
+    console.log(name);
+    elasticsearch.search('items', name).then(function(result) {
+        console.log(result.hits.total);
+        if (result.hits.total < parseInt(count)) {
+            continueElasticGet(req, res, name);
+        } else {
+            res.json(result);
+        }
+    });
+});
+
+
+app.get('/app/elastic/count/:word', function(req, res, next) {
+    var name = req.params.word;
+    elasticsearch.search('items', name).then(function(result) {
+            res.json(result);
+    });
+    //elasticsearch.ping();
     // esRes = JSON.parse(elasticsearch.search('items', name));
     // if (esRes is true) {
     //     return res.join(elasticsearch.search('items', name));
@@ -119,6 +178,15 @@ app.get('/app/elastic/users', function(req, res, next) {
     // while esRes is still false
     //     esRes = JSON.parse(elasticsearch.search('items', name));
     // return res.json(elasticsearch.search('items', name));
+});
+
+app.get('/app/elastic/reset', function(req, res, next) {
+    elasticsearch.deleteIndex('items').then(function(result) {
+        console.log('Deleted Index');
+    });
+    elasticsearch.createIndex('items').then(function(result) {
+        console.log('Created Index');
+    });
 });
 
 app.listen(PORT_NUMBER);

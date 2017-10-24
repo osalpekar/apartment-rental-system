@@ -181,12 +181,8 @@ app.get('/app/elastic/count/:word', function(req, res, next) {
 });
 
 app.get('/app/elastic/reset', function(req, res, next) {
-    elasticsearch.deleteIndex('items').then(function(result) {
-        console.log('Deleted Index');
-    });
-    elasticsearch.createIndex('items').then(function(result) {
-        console.log('Created Index');
-    });
+    elasticsearch.deleteIndex('items');
+    elasticsearch.createIndex('items');
 });
 
 app.listen(PORT_NUMBER);

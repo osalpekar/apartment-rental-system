@@ -180,5 +180,14 @@ app.get('/app/elastic/count/:word', function(req, res, next) {
     // return res.json(elasticsearch.search('items', name));
 });
 
+app.get('/app/elastic/reset', function(req, res, next) {
+    elasticsearch.deleteIndex('items').then(function(result) {
+        console.log('Deleted Index');
+    });
+    elasticsearch.createIndex('items').then(function(result) {
+        console.log('Created Index');
+    });
+});
+
 app.listen(PORT_NUMBER);
 // console.log('Navigate to http://localhost:3000/app/users');

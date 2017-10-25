@@ -1,8 +1,9 @@
 const quilt = require('@quilt/quilt');
 const elasticsearch = require('@quilt/elasticsearch');
 const nodeServer = require('./nodeServer.js').nodeServer;
+const spark = require('./sparkImgProc.js').sprk;
 
-const deployment = quilt.createDeployment({namespace: "omkar"});
+const deployment = quilt.createDeployment({namespace: "omkar", adminACL: ['0.0.0.0/0']});
 
 var baseMachine = new quilt.Machine({
     provider: "Amazon",
@@ -48,20 +49,29 @@ const postgresURL = 'postgresql://postgres:runner@' + postgres.getHostname() + '
 
 const node = new nodeServer(elastic, mysqlHost, elastic.uri(), postgresURL);
 
-const spark = new quilt.Container('spark', 'osalpekar/spark-image-compressor', {
-    env: {
-        'password': pw,
-        'port': '12347',
-        'mySQLHost': mysqlHost
-    }
-});
+// const spark = new quilt.Container('spark', 'osalpekar/spark-image-compressor', {
+//     env: {
+//         'password': pw,
+//         'port': '12347',
+//         'mySQLHost': mysqlHost
+//     }
+// });
+
+spark.setEnv('mySQLHost', mysqlHost);
 
 node.container.allowFrom(postgres, 5432);
 postgres.allowFrom(node.container, 5432);
 node.container.allowFrom(mysql, 3306);
 mysql.allowFrom(node.container, 3306);
-spark.allowFrom(mysql, 3306);
-mysql.allowFrom(spark, 3306);
+// spark.allowFrom(mysql, 3306);
+// mysql.allowFrom(spark, 3306);
+
+
+
+// quilt.allow(mysql, spark.masters, 3306);
+// quilt.allow(mysql, spark.workers, 3306);
+
+
 // node.container.allowFrom(mongo, 27017);
 // mongo.allowFrom(node.container, 27017);
 
@@ -71,7 +81,7 @@ quilt.allow(logstash, postgres, 5432);
 
 
 deployment.deploy(baseMachine.asMaster());
-deployment.deploy(baseMachine.asWorker().replicate(6));
+deployment.deploy(baseMachine.asWorker().replicate(9));
 node.deploy(deployment);
 deployment.deploy(elastic);
 deployment.deploy(logstash);

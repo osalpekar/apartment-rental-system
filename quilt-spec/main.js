@@ -68,8 +68,8 @@ mysql.allowFrom(node.container, 3306);
 
 
 
-// quilt.allow(mysql, spark.masters, 3306);
-// quilt.allow(mysql, spark.workers, 3306);
+quilt.allow(mysql, spark.masters, 3306);
+quilt.allow(mysql, spark.workers, 3306);
 
 
 // node.container.allowFrom(mongo, 27017);

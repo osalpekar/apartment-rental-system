@@ -9,7 +9,7 @@ var count1 = 0;
 const path = require('path');
 
 console.log(process.env.mySQLHost);
-const PORT_NUMBER = 3000;
+const PORT_NUMBER = 80;
 
 // mongoose.connect('mongodb://mongo.q/tenantData');
 

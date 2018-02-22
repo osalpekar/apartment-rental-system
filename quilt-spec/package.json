@@ -2,10 +2,13 @@
     "name": "apartment-spec",
     "version": "1.0.0",
     "main": "./main.js",
-    "author": "Omkar Salpekar",
+    "author": "Anson Tsai",
     "license": "MIT",
     "dependencies": {
         "@quilt/quilt": "file:../../quilt",
-        "@quilt/elasticsearch": "file:../../elasticsearch"
+        "@quilt/elasticsearch": "file:../../elasticsearch",
+        "@quilt/haproxy": "file:../../haproxy",
+        "@quilt/nodejs": "file:../../nodejs/",
+        "fs": "0.0.1-security"
     }
 }

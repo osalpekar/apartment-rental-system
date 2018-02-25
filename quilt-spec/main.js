@@ -11,7 +11,7 @@ var baseMachine = new quilt.Machine({
 });
 
 var countNode = 3;
-const nodeRepository = 'https://github.com/TsaiAnson/apartment-rental-system.git';
+const nodeRepository = 'tsaianson/node-apt-app';
 const apartmentApp = new nodeServer(countNode, nodeRepository);
 
 deployment.deploy(baseMachine.asMaster());

@@ -1,6 +1,5 @@
 const { Container, publicInternet } = require('@quilt/quilt');
 const haproxy = require('@quilt/haproxy');
-const Node = require('@quilt/nodejs');
 const Kibana = require('./kibana.js').Kibana;
 const spark = require('./sparkImgProc.js').sprk;
 const elasticsearch = require('@quilt/elasticsearch');
@@ -15,10 +14,14 @@ function nodeServer(count, nodeRepo) {
 
     this.kib = new Kibana(this.elastic);
 
+    this.spark = spark;
+
+    this.postgresPort = '5432';
+
     this.postgres = new Container('postgres', 'library/postgres:9.4', {
         env: {
             'password': this.pw,
-            'port': '5432'
+            'port': this.postgresPort,
         }
     });
 
@@ -31,64 +34,46 @@ function nodeServer(count, nodeRepo) {
         }
     });
 
-    // this.mongo = new Container('mongo', 'library/mongo', {
-    //     env: {
-    //         'password': this.pw,
-    //         'port': '27107'
-    //     }
-    // });
-
     this.mysqlHost = this.mysql.getHostname();
     this.postgresURL = 'postgresql://postgres:runner@' + this.postgres.getHostname() + ':5432/postgres';
     this.postgresHost = 'postgresql://postgres:runner@' + this.postgres.getHostname();
-    this.postgresPort = '5432';
 
-    this.app = new Node({
-	nWorker: count,
-	repo: nodeRepo,
+    this.app = new Container('aptApp', nodeRepo, {
+        command: ['node', 'server.js', '--port', '80'],
 	env:{
-	    //PORT: this.postgresPort,
         'mySQLHost': this.mysqlHost,
         'elasticURL': this.elastic.uri(),
         'postgresURL': this.postgresURL,
-        PW: this.pw,
-        HOST:'postgresql://postgres:runner@' + this.postgres.getHostname(),
-        PORT:'5432',
+        'PW': this.pw,
+        'HOST': this.postgresHost,
+        'PORT': this.postgresPort,
 		},
-    });
+    }).replicate(this.instance_number);
 
-    // this.app.withEnv('mySQLHost', );
-    // this.app.withEnv('elasticURL', this.elasticURL);
-    // this.app.withEnv('postgresURL', this.postgresURL);
-    // this.app.withEnv({'PW':this.pw, 'HOST':'postgresql://postgres:runner@' + this.postgres.getHostname(), 'PORT':'5432'});
-    // this.spark.setEnv('mySQLHost', this.mysqlHost);
-
-    this.proxy = haproxy.simpleLoadBalancer(this.app.cluster);
+    this.proxy = haproxy.simpleLoadBalancer(this.app);
     this.proxy.allowFrom(publicInternet, haproxy.exposedPort);
 
     for (i = 0; i < this.instance_number; i++) {
-        this.elastic.addClient(this.app.cluster[i]);
-        this.app.cluster[i].allowFrom(this.postgres, 5432);
-        this.postgres.allowFrom(this.app.cluster[i], 5432);
-        this.app.cluster[i].allowFrom(this.mysql, 3306);
-        this.mysql.allowFrom(this.app.cluster[i], 3306);
+        this.elastic.addClient(this.app[i]);
+        this.app[i].allowFrom(this.postgres, 5432);
+        this.postgres.allowFrom(this.app[i], 5432);
+        this.app[i].allowFrom(this.mysql, 3306);
+        this.mysql.allowFrom(this.app[i], 3306);
     }
 
     this.elastic.addClient(this.logstash);
-    this.logstash.allowFrom(this.postgres, 5432)
+    this.logstash.allowFrom(this.postgres, 5432);
+    this.postgres.allowFrom(this.logstash, 5432);
 
-    //this.mysql.allowFrom(spark.masters, 3306);
-    //this.mysql.allowFrom(spark.workers, 3306);
-
-    // logstash.placeOn({size: "m4.large"});
-
-    // elastic.addClient(node);
-
-    // this.app.allowFrom(mongo, 27017);
-    // this.mongo.allowFrom(node.app, 27017);
+    this.mysql.allowFrom(spark.masters, 3306);
+    this.mysql.allowFrom(spark.workers, 3306);
 
     this.deploy = function deploy(deployment) {
-    deployment.deploy([this.app, this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib]);
+        deployment.deploy([this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib]);
+        for (i = 0; i < this.instance_number; i++) {
+            deployment.deploy(this.app[i]);
+        }
+        this.spark.deploy(deployment);
     };
 }
 

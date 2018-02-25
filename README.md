@@ -1,7 +1,6 @@
-# Apartment Rental System
+# "Apartment Rental System"
 
-Application that allows apartment managers to track tenants. Built to test
-throttlebot system from Berkeley NetSys Lab.
+Heterogenous application consisting of several interdependent pipelines. Some services include: HAProxy, Elastic, Logstash, Kibana, mySQL, Postgres, Spark and more. Built to test ThrottleBot system from Berkeley NetSys Lab.
 
 
 # To Run

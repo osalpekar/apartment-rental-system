@@ -16,7 +16,7 @@ connection.connect(function(err) {
     var sql = "CREATE TABLE people (ID int NOT NULL AUTO_INCREMENT, text VARCHAR(255), PRIMARY KEY (ID))";
 
     connection.query(sql, function (err, result) {
-        if (err) throw err;
+        if (err) console.log(err);
         console.log("Table created");
     });
 });

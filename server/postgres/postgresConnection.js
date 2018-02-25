@@ -11,7 +11,7 @@ query.on('end', () => {
 	console.log('Test')
 })
 query.on('error', (err) => {
-	console.error(err.stack)
+	console.log(err.stack)
 })
 
 module.exports = client;

@@ -20,7 +20,7 @@ elasticsearch.createIndex('items');
 // The 5 endpoints are defined below
 
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the multiservice application!');
+    res.send('Welcome to the multiservice application V2!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {
@@ -148,21 +148,41 @@ var continueElasticGet = function(req, res, name) {
     });
 }
 
+// app.get('/app/elastic/users/:count', function(req, res, next) {
+//     var count = req.params.count;
+//     count1 = 0;
+//     name = Math.random().toString(36).substring(7);
+//     console.log(name);
+//     elasticsearch.search('items', name).then(function(result) {
+//         console.log(result.hits.total);
+//         if (result.hits.total < parseInt(count)) {
+//             continueElasticGet(req, res, name);
+//         } else {
+//             res.json(result);
+//         }
+//     });
+// });
+
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
-    count1 = 0;
     name = Math.random().toString(36).substring(7);
     console.log(name);
-    elasticsearch.search('items', name).then(function(result) {
-        console.log(result.hits.total);
-        if (result.hits.total < parseInt(count)) {
-            continueElasticGet(req, res, name);
-        } else {
-            res.json(result);
-        }
-    });
+    var iterations = 0;
+    while (iterations < count) {
+        postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+        {
+            elasticsearch.search('items', name).then(function(result) {
+                // Pass
+            });
+            var i;
+            for (i = 0; i < 10; i++) {
+                uname = Math.random().toString(36).substring(7);
+            }
+        });
+        iterations = iterations + 1;
+    }
+    res.json(res);
 });
-
 
 app.get('/app/elastic/count/:word', function(req, res, next) {
     var name = req.params.word;
